@@ -29,3 +29,6 @@ dependencies {
   implementation("me.hyperbone:hakobi:1.0.0")
 }
 ```
+
+## LICENSE
+[MIT License](./LICENSE) (© 2022 mirusms)
