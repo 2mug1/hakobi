@@ -7,6 +7,7 @@ import me.hyperbone.hakobi.hakobi.letter.handler.IncomingLetterHandler;
 import me.hyperbone.hakobi.hakobi.letter.handler.LetterExceptionHandler;
 import me.hyperbone.hakobi.hakobi.letter.listener.LetterListener;
 import me.hyperbone.hakobi.hakobi.letter.listener.LetterListenerData;
+import org.bukkit.plugin.Plugin;
 import org.json.JSONException;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -20,6 +21,7 @@ import java.util.Map;
 import java.util.concurrent.ForkJoinPool;
 
 public class Hakobi {
+    private final Plugin plugin;
 
     private final String channel;
     private final JedisPool jedisPool;
@@ -29,7 +31,8 @@ public class Hakobi {
     private JedisPubSub jedisPubSub;
     private final Map<String, List<LetterListenerData>> listeners = new HashMap<>();
 
-    public Hakobi(String channel, JedisPool jedisPool, Gson gson) {
+    public Hakobi(Plugin plugin, String channel, JedisPool jedisPool, Gson gson) {
+        this.plugin = plugin;
         this.channel = channel;
         this.jedisPool = jedisPool;
         this.gson = gson;
@@ -38,7 +41,8 @@ public class Hakobi {
         this.setupPubSub();
     }
 
-    public Hakobi(String channel, JedisPool jedisPool, String password, Gson gson) {
+    public Hakobi(Plugin plugin, String channel, JedisPool jedisPool, String password, Gson gson) {
+        this.plugin = plugin;
         this.channel = channel;
         this.jedisPool = jedisPool;
         this.password = password;
@@ -101,9 +105,9 @@ public class Hakobi {
                             }
                         }
                     } catch (JSONException ex) {
-                        System.out.println("[Hakobi] JSONの読み取りに失敗しました。");
+                        plugin.getLogger().warning("[Hakobi] JSONの読み取りに失敗しました。");
                     } catch (Exception ex) {
-                        System.out.println("[Hakobi] 手紙の処理に失敗しました。");
+                        plugin.getLogger().warning("[Hakobi] 手紙の処理に失敗しました。");
                         ex.printStackTrace();
                     }
                 }
@@ -116,9 +120,9 @@ public class Hakobi {
                     client.auth(this.password);
                 }
                 client.subscribe(jedisPubSub, channel);
-                System.out.println("[Hakobi] チャンネルの登録が完了しました。");
+                plugin.getLogger().warning("[Hakobi] チャンネルの登録が完了しました。");
             } catch (Exception ex) {
-                System.out.println("[Hakobi] チャンネルの登録に失敗しました。");
+                plugin.getLogger().warning("[Hakobi] チャンネルの登録に失敗しました。");
                 ex.printStackTrace();
             }
         });
